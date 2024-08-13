@@ -1,18 +1,16 @@
-# Project Variables
-
+### Project Variables ###
 variable "project_name" {
   type = string
 }
 
 variable "environment" {
-  type = string
+  type    = string
+  default = "dev"
 }
 
-# VPC Variables
-
-variable "cidr_block" {
-  type    = string
-  default = "10.0.0.0/16"
+### VPC Variables ###
+variable "vpc_cidr_block" {
+  type = string
 }
 
 variable "enable_dns_hostnames" {
@@ -30,72 +28,96 @@ variable "vpc_tags" {
   default = {}
 }
 
-# IGW Variables
-
-variable "igw_tags" {
-  type    = map(any)
-  default = {}
-}
-
-# Subnet Variables
-
-variable "availability_zones" {
+### Subnet Variables ###
+variable "public_subnet_cidr_blocks" {
   type = list(string)
-}
-
-variable "public_subnets" {
-  type = list(any)
   validation {
-    condition     = length(var.public_subnets) == 2
-    error_message = "Please provide only 2 public subnets"
+    condition     = length(var.public_subnet_cidr_blocks) == 2
+    error_message = "*** ERROR: THE LIST MUST HAVE ONLY 2 CIDR BLOCKS ***"
   }
 }
 
-variable "private_subnets" {
-  type = list(any)
-  validation {
-    condition     = length(var.private_subnets) == 2
-    error_message = "Please provide only 2 private subnets"
-  }
-}
-
-variable "database_subnets" {
-  type = list(any)
-  validation {
-    condition     = length(var.database_subnets) == 2
-    error_message = "Please provide only 2 database subnets"
-  }
-}
-
-variable "subnet_tags" {
+variable "public_subnet_tags" {
   type    = map(any)
   default = {}
 }
 
-# NAT Variables
+variable "private_subnet_cidr_blocks" {
+  type = list(string)
+  validation {
+    condition     = length(var.private_subnet_cidr_blocks) == 2
+    error_message = "*** ERROR: THE LIST MUST HAVE ONLY 2 CIDR BLOCKS ***"
+  }
+}
 
-variable "nat_tags" {
+variable "private_subnet_tags" {
   type    = map(any)
   default = {}
 }
 
-# EIP Variables
+variable "database_subnet_cidr_blocks" {
+  type = list(string)
+  validation {
+    condition     = length(var.database_subnet_cidr_blocks) == 2
+    error_message = "*** ERROR: THE LIST MUST HAVE ONLY 2 CIDR BLOCKS ***"
+  }
+}
 
+variable "database_subnet_tags" {
+  type    = map(any)
+  default = {}
+}
+
+### EIP Variables ###
 variable "eip_tags" {
   type    = map(any)
   default = {}
 }
 
-# RTB Variable
-
-variable "rtb_tags" {
+### IGW Variables ###
+variable "igw_tags" {
   type    = map(any)
   default = {}
 }
 
-# Peering Variables
+### NAT Variables ###
+variable "nat_tags" {
+  type    = map(any)
+  default = {}
+}
+
+### RTB Variables ###
+variable "public_route_table_tags" {
+  type    = map(any)
+  default = {}
+}
+
+variable "private_route_table_tags" {
+  type    = map(any)
+  default = {}
+}
+
+variable "database_route_table_tags" {
+  type    = map(any)
+  default = {}
+}
+
+### Peering Variables ###
+variable "is_peering_required" {
+  type = bool
+}
+
+variable "peer_vpc_id" {
+  type    = string
+  default = ""
+}
 
 variable "peering_tags" {
+  type    = map(any)
+  default = {}
+}
+
+variable "db_subnet_group_tags" {
   type    = map(any)
   default = {}
 }

@@ -1,37 +1,52 @@
+### Public Subnet ###
 resource "aws_subnet" "public" {
-  count  = length(var.public_subnets)
-  vpc_id = aws_vpc.main.id
+  count = length(var.public_subnet_cidr_blocks)
 
+  vpc_id            = aws_vpc.main.id
+  availability_zone = local.azs_list[count.index]
+
+  cidr_block              = var.public_subnet_cidr_blocks[count.index]
   map_public_ip_on_launch = true
 
-  cidr_block        = var.public_subnets[count.index]
-  availability_zone = var.availability_zones[count.index]
-
-  tags = merge(local.common_tags, var.subnet_tags, {
-    Name = "${var.project_name}-${var.environment}-subnet-public-${var.availability_zones[count.index]}"
+  tags = merge(local.common_tags, var.public_subnet_tags, {
+    Name = "${var.project_name}-${var.environment}-public-${local.azs_list[count.index]}"
   })
 }
 
+### Private Subnet ###
 resource "aws_subnet" "private" {
-  count  = length(var.private_subnets)
-  vpc_id = aws_vpc.main.id
+  count = length(var.private_subnet_cidr_blocks)
 
-  cidr_block        = var.private_subnets[count.index]
-  availability_zone = var.availability_zones[count.index]
+  vpc_id            = aws_vpc.main.id
+  availability_zone = local.azs_list[count.index]
 
-  tags = merge(local.common_tags, var.subnet_tags, {
-    Name = "${var.project_name}-${var.environment}-subnet-private-${var.availability_zones[count.index]}"
+  cidr_block = var.private_subnet_cidr_blocks[count.index]
+
+  tags = merge(local.common_tags, var.private_subnet_tags, {
+    Name = "${var.project_name}-${var.environment}-private-${local.azs_list[count.index]}"
   })
 }
 
+### Database Subnet ###
 resource "aws_subnet" "database" {
-  count  = length(var.database_subnets)
-  vpc_id = aws_vpc.main.id
+  count = length(var.database_subnet_cidr_blocks)
 
-  cidr_block        = var.database_subnets[count.index]
-  availability_zone = var.availability_zones[count.index]
+  vpc_id            = aws_vpc.main.id
+  availability_zone = local.azs_list[count.index]
 
-  tags = merge(local.common_tags, var.subnet_tags, {
-    Name = "${var.project_name}-${var.environment}-subnet-database-${var.availability_zones[count.index]}"
+  cidr_block = var.database_subnet_cidr_blocks[count.index]
+
+  tags = merge(local.common_tags, var.database_subnet_tags, {
+    Name = "${var.project_name}-${var.environment}-database-${local.azs_list[count.index]}"
+  })
+}
+
+### DB Subnet Group ###
+resource "aws_db_subnet_group" "this" {
+  name       = "${var.project_name}-${var.environment}-db-subnet-group"
+  subnet_ids = aws_subnet.database[*].id
+
+  tags = merge(local.common_tags, var.db_subnet_group_tags, {
+    Name = "${var.project_name}-${var.environment}-db-subnet-group"
   })
 }
